@@ -33,13 +33,13 @@ self.addEventListener( 'install', function ( event ) {
 			return cache.addAll( precachedResourcesAsDependency );
 		} )
 	);
-	logger.AddLog( "info", `ServiceWorker ${version} finished installing.` );
+	//logger.AddLog( "info", `ServiceWorker ${version} finished installing.` );
 } );
 
 self.addEventListener( 'fetch', function ( event ) {
 	let request = event.request.clone();
 	let requestURL = new URL( event.request.url );
-	logger.AddLog( "info", `Service Worker - fetching request: ${requestURL.href}`, requestURL );
+	//logger.AddLog( "info", `Service Worker - fetching request: ${requestURL.href}`, requestURL );
 	if ( requestURL.pathname == "/socket.io/" ) {
 		event.respondWith(
 			NetworkOnly( request )
@@ -62,35 +62,35 @@ self.addEventListener( 'fetch', function ( event ) {
 } );
 
 function CacheOnly( request ) {
-	logger.AddLog( "info", `${request.href}: Checking only cache for response`, request );
+	//logger.AddLog( "info", `${request.href}: Checking only cache for response`, request );
 	return caches.match( request )
 		.then( function ( cacheResponse ) {
-			logger.AddLog( "info", `Found response in cache`, cacheResponse );
+			//logger.AddLog( "info", `Found response in cache`, cacheResponse );
 			return cacheResponse;
 		} );
 }
 
 function NetworkOnly( request ) {
-	logger.AddLog( "info", `${request.href}: Getting response straight from network`, request );
+	//logger.AddLog( "info", `${request.href}: Getting response straight from network`, request );
 	return fetch( request, { cache: 'no-store' } );
 }
 
 function NetworkFallingBackToCache( request ) {
-	logger.AddLog( "info", `${request.href}: Getting reponse from network with cache fallback`, request );
+	//logger.AddLog( "info", `${request.href}: Getting reponse from network with cache fallback`, request );
 	return fetch( request, { cache: 'no-store' } )
 		.catch( function ( error ) {
-			logger.AddLog( "error", `Failed to get response from network, checking cache for fallback`, error );
+			//logger.AddLog( "error", `Failed to get response from network, checking cache for fallback`, error );
 			return caches.match( request );
 		} );
 }
 
 function CacheFallingBackToNetwork( request ) {
-	logger.AddLog( "info", `${request.href}: Getting reponse from cache with network fallback`, request );
+	//logger.AddLog( "info", `${request.href}: Getting reponse from cache with network fallback`, request );
 	return caches.match( request )
 		.then( function ( cacheResponse ) {
 			return cacheResponse || fetch( request, { cache: 'no-store' } )
 				.then( function ( networkResponse ) {
-					logger.AddLog( "info", "Failed to get response from cache. Retrieved response from network and placing it in cache..." );
+					//logger.AddLog( "info", "Failed to get response from cache. Retrieved response from network and placing it in cache..." );
 					return caches.open( dynamicname )
 						.then( function ( cache ) {
 							if ( [ 0, 200 ].includes( networkResponse.status ) ) {
@@ -100,7 +100,7 @@ function CacheFallingBackToNetwork( request ) {
 						} );
 				} )
 				.catch( function ( err ) {
-					logger.AddLog( "error", `Failed to get response from network or cache`, err );
+					//logger.AddLog( "error", `Failed to get response from network or cache`, err );
 				} );
 		} );
 }
@@ -121,5 +121,5 @@ self.addEventListener( 'activate', function ( event ) {
 			);
 		} )
 	);
-	logger.AddLog("info", `ServiceWorker ${version} finished activating.` );
+	//logger.AddLog("info", `ServiceWorker ${version} finished activating.` );
 } );
